@@ -61,8 +61,10 @@ void TicTacToe::setUpBoard()
 
     //set # of players and rows in total
     setNumberOfPlayers(2);
+    setAIPlayer(0);
     _gameOptions.rowX = 3;
     _gameOptions.rowY = 3;
+    
     
     //looping through from left-to-right & top-to-bottom
     //load all needed squares (9) spaced out by multiplying by 100
@@ -231,6 +233,9 @@ Player* TicTacToe::checkForWinner()
         std::vector<int> win_triple1,win_triple2,win_triple3,win_triple4,win_triple5,win_triple6,win_triple7, win_triple8;
 
         //check for 0 win_triples first and declare this as follows:
+        win_triple1.reserve(3);
+        win_triple2.reserve(3);
+        win_triple3.reserve(3);
         win_triple1 = {0, 1, 2};
         win_triple2 = {0, 3, 6};
         win_triple3 = {0, 4, 8};
@@ -258,6 +263,7 @@ Player* TicTacToe::checkForWinner()
    
     } 
     //do the check with {1,4,7}
+    win_triple4.reserve(3);
     win_triple4 = {1,4,7};
     if (player1.front() == 1) {
         if(winnerHelper(player1, win_triple4)) {
@@ -275,6 +281,8 @@ Player* TicTacToe::checkForWinner()
     }
 
     //do check with {2,5,8}, {2,4,6}
+    win_triple5.reserve(3);
+    win_triple6.reserve(3);
     win_triple5 = {2,5,8};
     win_triple6 = {2,4,6};
 
@@ -294,6 +302,7 @@ Player* TicTacToe::checkForWinner()
     }
 
     //check for {3,4,5}
+    win_triple7.reserve(3);
     win_triple7 = {3,4,5};
 
      if (player1.front() == 3) {
@@ -312,6 +321,7 @@ Player* TicTacToe::checkForWinner()
     }
 
     //check for {6,7,8}
+    win_triple8.reserve(3);
     win_triple8 = {6,7,8};
 
      if (player1.front() == 6) {
@@ -343,7 +353,7 @@ Player* TicTacToe::checkForWinner()
 
 //How I implemented:
 //only return true if there are no empty squares
-//otherwise it will return true if one is found in the for loop
+//otherwise it will return false if one is found in the for loop
 bool TicTacToe::checkForDraw()
 {
 
@@ -471,12 +481,92 @@ void TicTacToe::setStateString(const std::string &s)
 
 }
 
+//helper to end recursion in miniMax.
+
+//max is X: +1
+//min is O: -1
+//tie is: 0
+//implementation of the minimax algorithm for tictactoe
+int TicTacToe::miniMax(std::string &currentBoard, int &index, AIFunctions runAI, bool Maximizing, int depth) {
+    int winner = runAI.checkForWinnerAI(currentBoard);
+
+    if(winner == 1) return 1;
+    if(winner == 2) return -1;  
+    if(runAI.checkDrawAI(currentBoard)) return 0;
+
+    
+    if(Maximizing) {
+        int bestScore = -10000;
+        for(size_t i = 0; i < currentBoard.size(); i++) {
+            if(currentBoard[i] == '0') {
+                currentBoard[i] = '1';
+                int score = miniMax(currentBoard, index, runAI, false, depth++);
+                currentBoard[i] = '0';
+                bestScore = std::max(score, bestScore);
+                if(bestScore == 1) index = i;
+            }
+        }
+        return bestScore;
+    } else {
+        int bestScore = 10000;
+        for(size_t i = 0; i < currentBoard.size(); i++) {
+            if(currentBoard[i] == '0') {
+                currentBoard[i] = '2';
+                int score = miniMax(currentBoard, index, runAI, true, depth++);
+                currentBoard[i] = '0';
+                bestScore = std::min(score, bestScore);
+                if(bestScore == -1) index = i;
+            }
+        }
+
+        return bestScore;
+    }
+}
+
+
 
 //
 // this is the function that will be called by the AI
-//
+//will use current state string to get how the board is?
+//this function will use 3 int variables
+//bestScore: will save what is the highest score move for AI
+//bestmove: will save what position the bestScore was found at
+//score: in the loop will hold what is the score for that position.
 void TicTacToe::updateAI() 
 {
+    if(checkForDraw()) return; //check if game is full
+    AIFunctions runAI;
+    std::string currentBoard = stateString();
+    int index = 0;
+    int bestScore = -10000; //basically inf..
+
+    for(size_t i = 0; i < currentBoard.size(); i++) {
+         if(currentBoard[i] == '0') {
+            currentBoard[i] = '1';
+            int score = miniMax(currentBoard, index, runAI, false, 0);
+            currentBoard[i] = '0';
+            bestScore = std::max(score, bestScore);
+         }
+        }
+      
+    
+    
+    
+
+
+
+        std::cout << "AI Final Score: " << bestScore << std::endl;
+            std::cout << "At Index: " << index << std::endl << std::endl;
+        int y = index / 3;
+        int x = index % 3;
+        BitHolder &holder = getHolderAt(y, x);
+
+    if(actionForEmptyHolder(&holder)) {
+        endTurn();
+    }
+    
+    
+
     // we will implement the AI in the next assignment!
 }
 

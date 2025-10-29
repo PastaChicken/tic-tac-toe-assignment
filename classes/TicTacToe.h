@@ -1,6 +1,7 @@
 #pragma once
 #include "Game.h"
 #include "Square.h"
+#include "AIFunctions.h"
 
 //
 // the classic game of tic tac toe
@@ -34,6 +35,8 @@ public:
 private:
     Bit *       PieceForPlayer(const int playerNumber);
     Player*     ownerAt(int index ) const;
+    //added functions.
+    int         miniMax(std::string &stateString, int &index, AIFunctions runTest, bool Maximizin, int depth);
 
     Square      _grid[3][3];
 };

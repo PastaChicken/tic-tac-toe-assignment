@@ -24,6 +24,7 @@ TODO LIST:
     am unaware of that will help with readability.
 
 6.Required comments describing implementation
-    -DONE: added comments inside fuction and ontop of function describing how i implemented them
+    -DONE: added comments inside fuction and ontop of function describing how I implemented them
 
 7.Extra credit: a simple AI
+    -Incomplete as of now
